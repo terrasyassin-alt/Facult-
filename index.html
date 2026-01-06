@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Formulaire — Faculté</title>
+<!-- PizZip -->
+<script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.5/dist/pizzip.min.js"></script>
+
+<!-- Docxtemplater للمتصفح -->
+<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
+
+<!-- FileSaver لحفظ الملف -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 
   <link rel="icon" type="image/webp" href="e6BLSyxAVseR42LJ9kswxr1I8SIc9debjnAs8f3C_medium.webp">
 
@@ -236,15 +245,12 @@ button.secondary{
   </form>
 </div>
 
-<script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
 <script>
-// Export Word (GitHub Pages compatible)
+// زر Exporter vers Word
 document.getElementById("exportWord").addEventListener("click", async () => {
   try {
-    const url = "liste.docx"; // القالب في نفس المجلد
+    // القالب موجود في نفس المجلد
+    const url = "liste.docx"; 
     const response = await fetch(url);
     if (!response.ok) throw new Error("❌ قالب Word غير موجود");
     const content = await response.arrayBuffer();
@@ -254,23 +260,24 @@ document.getElementById("exportWord").addEventListener("click", async () => {
 
     // استخراج البيانات من النموذج
     const formData = new FormData(document.getElementById("studentForm"));
-    const obj = {};
-    for (const [k,v] of formData.entries()) obj[k] = v;
-    obj.date = new Date().toLocaleDateString("fr-FR");
+    const data = {};
+    for (const [key, value] of formData.entries()) data[key] = value;
+    data.date = new Date().toLocaleDateString("fr-FR");
 
-    // ملء القالب
-    doc.render(obj);
+    doc.render(data);
 
     // إنشاء وتحميل الملف
-    const blob = doc.getZip().generate({
-      type:"blob",
-      mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    });
+    const blob = doc.getZip().generate({ type: "blob" });
     saveAs(blob, "liste_inscrit_2025_2026.docx");
 
-  } catch(e) {
-    alert(e.message);
+  } catch (error) {
+    alert(error.message);
   }
+});
+
+// زر Enregistrer (اختياري)
+document.getElementById("saveDB").addEventListener("click", () => {
+  alert("ℹ️ زر Enregistrer مخصص للسيرفر، GitHub Pages لا يدعم DB.");
 });
 </script>
 
@@ -278,6 +285,7 @@ document.getElementById("exportWord").addEventListener("click", async () => {
 
 </body>
 </html>
+
 
 
 
