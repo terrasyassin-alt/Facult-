@@ -46,8 +46,10 @@ header.top{
 }
 
 header.top img{
-  width:80px;
-  margin-bottom:10px;
+  width:140px;
+  margin-bottom:12px;
+  height:auto;
+  max-width:90%;
 }
 
 header.top h1{
@@ -96,10 +98,25 @@ input:focus{
 }
 
 .radio-group{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:8px;
+}
+
+.radio-group label{
   display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-top:6px;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  cursor:pointer;
+  background:#f9fafb;
+}
+
+.radio-group input[type="radio"]{
+  transform:scale(1.2);
 }
 
 .radio-group label{
@@ -134,6 +151,8 @@ button.secondary{
   background:#eef2ff;
   color:var(--accent);
 }
+    @media (max-width:600px;){
+      header.top img{width:170px;}}
   </style>
 </head>
 
@@ -262,6 +281,7 @@ document.getElementById("saveDB").addEventListener("click", () => {
 
 </body>
 </html>
+
 
 
 
