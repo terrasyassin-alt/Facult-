@@ -8,6 +8,50 @@
   <link rel="icon" type="image/webp" href="e6BLSyxAVseR42LJ9kswxr1I8SIc9debjnAs8f3C_medium.webp">
 
   <style>
+    .top{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.logo{
+  width:70px;
+  height:auto;
+}
+
+@media (max-width:600px){
+  body{
+    padding:10px;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  form{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:1;
+  }
+
+  .radio-group{
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  button{
+    width:100%;
+  }
+}
     :root{--accent:#2065d1}
     *{box-sizing:border-box;font-family:Inter,Arial,'Amiri',serif}
     body{margin:0;background:#eef4ff;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px}
@@ -32,10 +76,12 @@
 <body>
 
 <div class="card">
-  <header>
-    <img src="usmba_90.png" alt="logo">
+  <header class="top">
+    <img src="usmba_90h.png" alt="logo" class="logo">
+    <div>
     <h1>Formulaire — Faculté</h1>
     <p>Remplissez les informations de l'étudiant(e)</p>
+    </div>
   </header>
 
   <form id="studentForm">
@@ -152,4 +198,5 @@ document.getElementById("saveDB").addEventListener("click", () => {
 
 </body>
 </html>
+
 
