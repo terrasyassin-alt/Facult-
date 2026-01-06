@@ -152,7 +152,7 @@ button.secondary{
   color:var(--accent);
 }
     @media (max-width:600px;){
-      header.top img{width:170px;}}
+      header.top img{width:170px;} }
   </style>
 </head>
 
@@ -238,46 +238,42 @@ button.secondary{
 
 <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
 <script src="https://unpkg.com/docxtemplater@3.37.0/build/docxtemplater.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script>
-// Export Word (GitHub Pages compatible)
-document.getElementById("exportWord").addEventListener("click", () => {
-  fetch("liste.docx")
-    .then(r => {
-      if (!r.ok) throw new Error();
-      return r.arrayBuffer();
-    })
-    .then(content => {
-      const zip = new PizZip(content);
-      const doc = new docxtemplater(zip);
+// Export Word (GitHub Pages compatible, template from same folder)
+document.getElementById("exportWord").addEventListener("click", async () => {
+  try {
+    // القالب موجود في نفس المجلد
+    const url = "liste.docx";
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("❌ قالب Word غير موجود");
+    const content = await response.arrayBuffer();
 
-      const data = new FormData(document.getElementById("studentForm"));
-      const obj = {};
-      for (const [k,v] of data.entries()) obj[k]=v;
+    const zip = new PizZip(content);
+    const doc = new window.Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-      obj.date = new Date().toLocaleDateString("fr-FR");
+    // استخراج البيانات من النموذج
+    const formData = new FormData(document.getElementById("studentForm"));
+    const obj = {};
+    for (const [k,v] of formData.entries()) obj[k] = v;
+    obj.date = new Date().toLocaleDateString("fr-FR");
 
-      doc.setData(obj);
-      doc.render();
+    // ملء القالب
+    doc.render(obj);
 
-      const blob = doc.getZip().generate({
-        type:"blob",
-        mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      });
+    // إنشاء وتحميل الملف
+    const blob = doc.getZip().generate({
+      type:"blob",
+      mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    });
+    saveAs(blob, "liste_inscrit_2025_2026.docx");
 
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "liste_inscrit_2025_2026.docx";
-      a.click();
-    })
-    .catch(() => alert("❌ قالب Word غير موجود"));
-});
-
-// Enregistrer (message فقط على GitHub)
-document.getElementById("saveDB").addEventListener("click", () => {
-  alert("ℹ️ زر Enregistrer مخصص لنسخة السيرفر (PHP / Python).\nGitHub Pages لا يدعم قاعدة البيانات.");
+  } catch(e) {
+    alert(e.message);
+  }
 });
 </script>
+
 
 </body>
 </html>
