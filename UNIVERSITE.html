@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Formulaire — Faculté</title>
+
+  <link rel="icon" type="image/webp" href="e6BLSyxAVseR42LJ9kswxr1I8SIc9debjnAs8f3C_medium.webp">
+
+  <style>
+    :root{--accent:#2065d1}
+    *{box-sizing:border-box;font-family:Inter,Arial,'Amiri',serif}
+    body{margin:0;background:#eef4ff;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px}
+    .card{background:#fff;max-width:900px;width:100%;padding:28px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+    header{text-align:center;margin-bottom:20px}
+    img{max-height:80px;margin-bottom:10px}
+    form{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .full{grid-column:1/3}
+    label{font-size:13px}
+    input{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc}
+    .ar{direction:rtl;text-align:right}
+    .fr{direction:ltr;text-align:left}
+    .radio-group{display:flex;gap:10px;flex-wrap:wrap}
+    .actions{grid-column:1/3;display:flex;gap:10px;justify-content:flex-end}
+    button{padding:10px 16px;border-radius:8px;border:0;cursor:pointer}
+    .primary{background:var(--accent);color:#fff}
+    .secondary{background:#eef2ff;color:var(--accent)}
+    @media(max-width:700px){form{grid-template-columns:1fr}.full{grid-column:1}}
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <header>
+    <img src="images.jfif" alt="logo">
+    <h1>Formulaire — Faculté</h1>
+    <p>Remplissez les informations de l'étudiant(e)</p>
+  </header>
+
+  <form id="studentForm">
+
+    <div class="full">
+      <label>Nom *</label>
+      <input name="nom_ar" class="ar" placeholder="الاسم العائلي بالعربية" required>
+      <input name="nom_fr" class="fr" placeholder="Nom en français" required>
+    </div>
+
+    <div class="full">
+      <label>Prénom *</label>
+      <input name="prenom_ar" class="ar" placeholder="الاسم الشخصي بالعربية" required>
+      <input name="prenom_fr" class="fr" placeholder="Prénom en français" required>
+    </div>
+
+    <div class="full">
+      <label>Intitulé du diplôme universitaire / certificat *</label>
+      <input name="directeur_un" class="fr" placeholder="Intitulé du diplôme ou certificat" required>
+    </div>
+
+    <div>
+      <label>Qualité *</label>
+      <div class="radio-group">
+        <label><input type="radio" name="qualite" value="Étudiant" required> Étudiant</label>
+        <label><input type="radio" name="qualite" value="Résident"> Résident</label>
+        <label><input type="radio" name="qualite" value="Spécialité"> Spécialité</label>
+        <label><input type="radio" name="qualite" value="Professeur"> Professeur</label>
+      </div>
+    </div>
+
+    <div>
+      <label>Directeur du diplôme *</label>
+      <input name="directeur_fr" class="fr" placeholder="Nom du directeur du diplôme" required>
+    </div>
+
+    <div class="full">
+      <label>E-mail *</label>
+      <input type="email" name="email" placeholder="exemple@domaine.com" required>
+    </div>
+
+    <div>
+      <label>CIN *</label>
+      <input name="cin_fr" class="fr" placeholder="CIN (ex: AB123456)" required>
+    </div>
+
+    <div>
+      <label>Téléphone *</label>
+      <input type="tel" name="tel" placeholder="0600000000" required>
+    </div>
+
+    <div class="full">
+      <label>Date de naissance *</label>
+      <input type="date" name="date_naissance" required>
+    </div>
+
+    <div class="full">
+      <label>Lieu de naissance *</label>
+      <input name="lieu_ar" class="ar" placeholder="مكان الولادة بالعربية" required>
+      <input name="lieu_fr" class="fr" placeholder="Lieu de naissance en français" required>
+    </div>
+
+    <div class="actions">
+      <button type="reset" class="secondary">Réinitialiser</button>
+      <button type="button" class="primary" id="exportWord">Exporter vers Word</button>
+      <button type="button" class="primary" id="saveDB">Enregistrer</button>
+    </div>
+
+  </form>
+</div>
+
+<script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
+<script src="https://unpkg.com/docxtemplater@3.37.0/build/docxtemplater.js"></script>
+
+<script>
+// Export Word (GitHub Pages compatible)
+document.getElementById("exportWord").addEventListener("click", () => {
+  fetch("liste des inscrits 2025-2026.docx")
+    .then(r => {
+      if (!r.ok) throw new Error();
+      return r.arrayBuffer();
+    })
+    .then(content => {
+      const zip = new PizZip(content);
+      const doc = new docxtemplater(zip);
+
+      const data = new FormData(document.getElementById("studentForm"));
+      const obj = {};
+      for (const [k,v] of data.entries()) obj[k]=v;
+
+      obj.date = new Date().toLocaleDateString("fr-FR");
+
+      doc.setData(obj);
+      doc.render();
+
+      const blob = doc.getZip().generate({
+        type:"blob",
+        mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      });
+
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "liste_inscrit_2025_2026.docx";
+      a.click();
+    })
+    .catch(() => alert("❌ قالب Word غير موجود"));
+});
+
+// Enregistrer (message فقط على GitHub)
+document.getElementById("saveDB").addEventListener("click", () => {
+  alert("ℹ️ زر Enregistrer مخصص لنسخة السيرفر (PHP / Python).\nGitHub Pages لا يدعم قاعدة البيانات.");
+});
+</script>
+
+</body>
+</html>
