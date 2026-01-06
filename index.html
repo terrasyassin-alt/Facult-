@@ -4,20 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Formulaire — Faculté</title>
-<!-- PizZip -->
-<script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.5/dist/pizzip.min.js"></script>
-
-<!-- Docxtemplater للمتصفح -->
-<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
-
-<!-- FileSaver لحفظ الملف -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
 
   <link rel="icon" type="image/webp" href="e6BLSyxAVseR42LJ9kswxr1I8SIc9debjnAs8f3C_medium.webp">
 
   <style>
- :root{
+:root{
   --bg:#f4f7fb;
   --card:#ffffff;
   --accent:#2065d1;
@@ -160,8 +151,10 @@ button.secondary{
   background:#eef2ff;
   color:var(--accent);
 }
-    @media (max-width:600px;){
-      header.top img{width:170px;} }
+
+@media (max-width:600px;){
+  header.top img{width:170px;}
+}
   </style>
 </head>
 
@@ -171,8 +164,8 @@ button.secondary{
   <header class="top">
     <img src="usmba_90h.png" alt="logo" class="logo">
     <div>
-    <h1>Formulaire — Faculté</h1>
-    <p>Remplissez les informations de l'étudiant(e)</p>
+      <h1>Formulaire — Faculté</h1>
+      <p>Remplissez les informations de l'étudiant(e)</p>
     </div>
   </header>
 
@@ -245,12 +238,19 @@ button.secondary{
   </form>
 </div>
 
+<!-- السكربتات يجب وضعها هنا بعد النموذج -->
+
+<!-- PizZip -->
+<script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.5/dist/pizzip.min.js"></script>
+<!-- Docxtemplater المتصفح -->
+<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
+<!-- FileSaver -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 <script>
-// زر Exporter vers Word
 document.getElementById("exportWord").addEventListener("click", async () => {
   try {
-    // القالب موجود في نفس المجلد
-    const url = "liste.docx"; 
+    const url = "liste.docx"; // القالب في نفس المجلد
     const response = await fetch(url);
     if (!response.ok) throw new Error("❌ قالب Word غير موجود");
     const content = await response.arrayBuffer();
@@ -258,7 +258,6 @@ document.getElementById("exportWord").addEventListener("click", async () => {
     const zip = new PizZip(content);
     const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-    // استخراج البيانات من النموذج
     const formData = new FormData(document.getElementById("studentForm"));
     const data = {};
     for (const [key, value] of formData.entries()) data[key] = value;
@@ -266,7 +265,6 @@ document.getElementById("exportWord").addEventListener("click", async () => {
 
     doc.render(data);
 
-    // إنشاء وتحميل الملف
     const blob = doc.getZip().generate({ type: "blob" });
     saveAs(blob, "liste_inscrit_2025_2026.docx");
 
@@ -275,21 +273,10 @@ document.getElementById("exportWord").addEventListener("click", async () => {
   }
 });
 
-// زر Enregistrer (اختياري)
 document.getElementById("saveDB").addEventListener("click", () => {
   alert("ℹ️ زر Enregistrer مخصص للسيرفر، GitHub Pages لا يدعم DB.");
 });
 </script>
 
-
-
 </body>
 </html>
-
-
-
-
-
-
-
-
