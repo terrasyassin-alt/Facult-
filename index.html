@@ -237,20 +237,20 @@ button.secondary{
 </div>
 
 <script src="https://unpkg.com/pizzip@3.1.5/dist/pizzip.min.js"></script>
-<script src="https://unpkg.com/docxtemplater@3.37.0/build/docxtemplater.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 <script>
-// Export Word (GitHub Pages compatible, template from same folder)
+// Export Word (GitHub Pages compatible)
 document.getElementById("exportWord").addEventListener("click", async () => {
   try {
-    // القالب موجود في نفس المجلد
-    const url = "liste.docx";
+    const url = "liste.docx"; // القالب في نفس المجلد
     const response = await fetch(url);
     if (!response.ok) throw new Error("❌ قالب Word غير موجود");
     const content = await response.arrayBuffer();
 
     const zip = new PizZip(content);
-    const doc = new window.Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
     // استخراج البيانات من النموذج
     const formData = new FormData(document.getElementById("studentForm"));
@@ -275,8 +275,10 @@ document.getElementById("exportWord").addEventListener("click", async () => {
 </script>
 
 
+
 </body>
 </html>
+
 
 
 
