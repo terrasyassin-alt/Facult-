@@ -263,11 +263,9 @@ document.getElementById("exportWord").addEventListener("click", async () => {
   const originalText = btn.textContent;
   
   try {
-    // تعطيل الزر أثناء المعالجة
     btn.disabled = true;
     btn.textContent = "⏳ Chargement...";
     
-    // التحقق من المكتبات
     if (typeof PizZip === 'undefined') {
       throw new Error("❌ Erreur: PizZip non chargé. Actualisez la page.");
     }
@@ -276,36 +274,30 @@ document.getElementById("exportWord").addEventListener("click", async () => {
       throw new Error("❌ Erreur: Docxtemplater non chargé. Actualisez la page.");
     }
 
-    // جلب ملف القالب من نفس المجلد
+    // جلب ملف القالب من GitHub
     btn.textContent = "⏳ Chargement du modèle...";
     const response = await fetch("liste.docx");
     
     if (!response.ok) {
-      throw new Error("❌ Le fichier 'liste.docx' est introuvable dans le même dossier que ce fichier HTML.\n\nAssurez-vous que:\n1. Le fichier s'appelle exactement 'liste.docx'\n2. Il est dans le même dossier que ce fichier HTML\n3. Vous avez téléchargé les changements sur le serveur");
+      throw new Error("❌ Le fichier 'liste.docx' est introuvable.\n\nAssurez-vous qu'il est bien téléchargé sur GitHub dans le même dossier.");
     }
     
     const content = await response.arrayBuffer();
-    console.log('✓ Modèle chargé depuis le serveur');
+    console.log('✓ Modèle chargé');
 
     const zip = new PizZip(content);
     
-    // إنشاء docxtemplater
     const doc = new window.docxtemplater(zip, { 
       paragraphLoop: true, 
       linebreaks: true,
       nullGetter: function(part) {
-        if (!part.module) {
-          return "";
-        }
-        if (part.module === "rawxml") {
-          return "";
-        }
+        if (!part.module) return "";
+        if (part.module === "rawxml") return "";
         return "";
       }
     });
 
-    // جمع البيانات من النموذج
-    btn.textContent = "⏳ Traitement des données...";
+    btn.textContent = "⏳ Traitement...";
     const formData = new FormData(document.getElementById("studentForm"));
     const data = {};
     
@@ -317,16 +309,15 @@ document.getElementById("exportWord").addEventListener("click", async () => {
     
     console.log('📝 Données:', data);
 
-    // معالجة القالب
     try {
       doc.render(data);
     } catch (error) {
       console.error('Erreur de rendu:', error);
       
-      let errorMessage = "❌ Erreur lors du remplissage du document:\n\n";
+      let errorMessage = "❌ Erreur lors du remplissage:\n\n";
       
       if (error.properties && error.properties.errors) {
-        errorMessage += "Variables manquantes dans le modèle:\n";
+        errorMessage += "Variables manquantes:\n";
         error.properties.errors.forEach((err) => {
           errorMessage += `• {${err.properties.id}}\n`;
         });
@@ -340,8 +331,7 @@ document.getElementById("exportWord").addEventListener("click", async () => {
       throw new Error(errorMessage);
     }
 
-    // إنشاء وحفظ الملف
-    btn.textContent = "⏳ Génération du fichier...";
+    btn.textContent = "⏳ Génération...";
     const blob = doc.getZip().generate({ 
       type: "blob",
       mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -372,4 +362,3 @@ document.getElementById("saveDB").addEventListener("click", () => {
 
 </body>
 </html>
-
