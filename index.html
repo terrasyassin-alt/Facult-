@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Formulaire — Faculté</title>
 
-  <link rel="icon" type="image/webp" href="e6BLSyxAVseR42LJ9kswxr1I8SIc9debjnAs8f3C_medium.webp">
-
   <style>
 :root{
   --bg:#f4f7fb;
@@ -69,6 +67,12 @@ form{
   gap:16px;
 }
 
+.full{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
 label{
   font-size:14px;
   margin-bottom:6px;
@@ -113,17 +117,14 @@ input:focus{
   border-radius:12px;
   cursor:pointer;
   background:#f9fafb;
+  font-size:15px;
+  margin-bottom:0;
 }
 
 .radio-group input[type="radio"]{
+  width:auto;
   transform:scale(1.2);
-}
-
-.radio-group label{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:15px;
+  margin:0;
 }
 
 .actions{
@@ -140,6 +141,12 @@ button{
   font-size:16px;
   font-weight:600;
   cursor:pointer;
+  transition: all 0.3s;
+}
+
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
 }
 
 button.primary{
@@ -147,12 +154,20 @@ button.primary{
   color:white;
 }
 
+button.primary:hover:not(:disabled){
+  background:#1a52a8;
+}
+
 button.secondary{
   background:#eef2ff;
   color:var(--accent);
 }
 
-@media (max-width:600px;){
+button.secondary:hover{
+  background:#dce4ff;
+}
+
+@media (max-width:600px){
   header.top img{width:170px;}
 }
   </style>
@@ -191,10 +206,10 @@ button.secondary{
     <div>
       <label>Qualité *</label>
       <div class="radio-group">
-        <label>Étudiant<input type="radio" name="qualite" value="Étudiant" required></label>
-        <label>Résident<input type="radio" name="qualite" value="Résident"></label>
-        <label>Spécialité<input type="radio" name="qualite" value="Spécialité"></label>
-        <label>Professeur<input type="radio" name="qualite" value="Professeur"></label>
+        <label><input type="radio" name="qualite" value="Étudiant" required> Étudiant</label>
+        <label><input type="radio" name="qualite" value="Résident"> Résident</label>
+        <label><input type="radio" name="qualite" value="Spécialité"> Spécialité</label>
+        <label><input type="radio" name="qualite" value="Professeur"> Professeur</label>
       </div>
     </div>
 
@@ -238,45 +253,123 @@ button.secondary{
   </form>
 </div>
 
-<!-- السكربتات يجب وضعها هنا بعد النموذج -->
-
-<!-- PizZip -->
-<script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.5/dist/pizzip.min.js"></script>
-<!-- Docxtemplater المتصفح -->
-<script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.37.0/build/docxtemplater.js"></script>
-<!-- FileSaver -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://unpkg.com/pizzip@3.1.7/dist/pizzip.js"></script>
+<script src="https://unpkg.com/docxtemplater@3.50.0/build/docxtemplater.js"></script>
+<script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <script>
 document.getElementById("exportWord").addEventListener("click", async () => {
+  const btn = document.getElementById("exportWord");
+  const originalText = btn.textContent;
+  
   try {
-    const url = "liste.docx"; // القالب في نفس المجلد
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("❌ قالب Word غير موجود");
+    // تعطيل الزر أثناء المعالجة
+    btn.disabled = true;
+    btn.textContent = "⏳ Chargement...";
+    
+    // التحقق من المكتبات
+    if (typeof PizZip === 'undefined') {
+      throw new Error("❌ Erreur: PizZip non chargé. Actualisez la page.");
+    }
+    
+    if (typeof window.docxtemplater === 'undefined') {
+      throw new Error("❌ Erreur: Docxtemplater non chargé. Actualisez la page.");
+    }
+
+    // جلب ملف القالب من نفس المجلد
+    btn.textContent = "⏳ Chargement du modèle...";
+    const response = await fetch("liste.docx");
+    
+    if (!response.ok) {
+      throw new Error("❌ Le fichier 'liste.docx' est introuvable dans le même dossier que ce fichier HTML.\n\nAssurez-vous que:\n1. Le fichier s'appelle exactement 'liste.docx'\n2. Il est dans le même dossier que ce fichier HTML\n3. Vous avez téléchargé les changements sur le serveur");
+    }
+    
     const content = await response.arrayBuffer();
+    console.log('✓ Modèle chargé depuis le serveur');
 
     const zip = new PizZip(content);
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    
+    // إنشاء docxtemplater
+    const doc = new window.docxtemplater(zip, { 
+      paragraphLoop: true, 
+      linebreaks: true,
+      nullGetter: function(part) {
+        if (!part.module) {
+          return "";
+        }
+        if (part.module === "rawxml") {
+          return "";
+        }
+        return "";
+      }
+    });
 
+    // جمع البيانات من النموذج
+    btn.textContent = "⏳ Traitement des données...";
     const formData = new FormData(document.getElementById("studentForm"));
     const data = {};
-    for (const [key, value] of formData.entries()) data[key] = value;
+    
+    for (const [key, value] of formData.entries()) {
+      data[key] = value.trim();
+    }
+    
     data.date = new Date().toLocaleDateString("fr-FR");
+    
+    console.log('📝 Données:', data);
 
-    doc.render(data);
+    // معالجة القالب
+    try {
+      doc.render(data);
+    } catch (error) {
+      console.error('Erreur de rendu:', error);
+      
+      let errorMessage = "❌ Erreur lors du remplissage du document:\n\n";
+      
+      if (error.properties && error.properties.errors) {
+        errorMessage += "Variables manquantes dans le modèle:\n";
+        error.properties.errors.forEach((err) => {
+          errorMessage += `• {${err.properties.id}}\n`;
+        });
+        
+        errorMessage += "\n💡 Variables disponibles:\n";
+        errorMessage += Object.keys(data).map(key => `{${key}}`).join(', ');
+      } else {
+        errorMessage += error.message;
+      }
+      
+      throw new Error(errorMessage);
+    }
 
-    const blob = doc.getZip().generate({ type: "blob" });
+    // إنشاء وحفظ الملف
+    btn.textContent = "⏳ Génération du fichier...";
+    const blob = doc.getZip().generate({ 
+      type: "blob",
+      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    });
+    
     saveAs(blob, "liste_inscrit_2025_2026.docx");
+    
+    btn.textContent = "✅ Exporté!";
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }, 2000);
+    
+    alert("✅ Document exporté avec succès!");
 
   } catch (error) {
+    console.error('❌ Erreur:', error);
     alert(error.message);
+    btn.textContent = originalText;
+    btn.disabled = false;
   }
 });
 
 document.getElementById("saveDB").addEventListener("click", () => {
-  alert("ℹ️ زر Enregistrer مخصص للسيرفر، GitHub Pages لا يدعم DB.");
+  alert("ℹ️ Le bouton Enregistrer est destiné au serveur.\nGitHub Pages ne supporte pas les bases de données.");
 });
 </script>
 
 </body>
 </html>
+
