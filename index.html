@@ -249,7 +249,7 @@ button.secondary:hover{
 
     <div class="full">
       <label>Intitulé du diplôme universitaire / certificat *</label>
-      <input name="directeur_un" class="fr" placeholder="Intitulé du diplôme ou certificat" required>
+      <input name="diplome" class="fr" placeholder="Intitulé du diplôme ou certificat" required>
       <span class="error-message" id="error-diplome">Veuillez remplir l'intitulé du diplôme</span>
     </div>
 
@@ -266,7 +266,7 @@ button.secondary:hover{
 
     <div>
       <label>Directeur du diplôme *</label>
-      <input name="directeur_fr" class="fr" placeholder="Nom du directeur du diplôme" required>
+      <input name="directeur_un" class="fr" placeholder="Nom du directeur du diplôme" required>
       <span class="error-message" id="error-directeur">Veuillez remplir le nom du directeur</span>
     </div>
 
@@ -332,8 +332,8 @@ function validateForm() {
     { name: 'nom_fr', errorId: 'error-nom', label: 'Nom (français)' },
     { name: 'prenom_ar', errorId: 'error-prenom', label: 'Prénom (arabe)' },
     { name: 'prenom_fr', errorId: 'error-prenom', label: 'Prénom (français)' },
-    { name: 'directeur_un', errorId: 'error-diplome', label: 'Intitulé du diplôme' },
-    { name: 'directeur_fr', errorId: 'error-directeur', label: 'Directeur du diplôme' },
+    { name: 'diplome', errorId: 'error-diplome', label: 'Intitulé du diplôme' },
+    { name: 'directeur_un', errorId: 'error-directeur', label: 'Directeur du diplôme' },
     { name: 'email', errorId: 'error-email', label: 'E-mail' },
     { name: 'cin_fr', errorId: 'error-cin', label: 'CIN' },
     { name: 'tel', errorId: 'error-tel', label: 'Téléphone' },
@@ -522,3 +522,4 @@ document.querySelectorAll('input[name="qualite"]').forEach(radio => {
 
 </body>
 </html>
+
